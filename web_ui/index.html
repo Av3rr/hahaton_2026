@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>T2 Schedule Calendar UI</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Календарь графика</h1>
+
+      <section class="card">
+        <h2>1) Подключение к API</h2>
+        <div class="grid-2">
+          <label>
+            API URL
+            <input id="apiUrl" type="text" value="http://localhost:8000" />
+          </label>
+          <label>
+            Email
+            <input id="email" type="email" placeholder="user@example.com" />
+          </label>
+          <label>
+            Пароль
+            <input id="password" type="password" placeholder="••••••••" />
+          </label>
+        </div>
+        <div class="row">
+          <button id="loginBtn">Войти</button>
+          <button id="loadBtn" class="secondary">Загрузить период и график</button>
+          <span id="authState" class="muted">Не авторизован</span>
+        </div>
+      </section>
+
+      <section class="card" id="periodCard" hidden>
+        <h2>2) Период</h2>
+        <p id="periodText" class="muted"></p>
+        <div class="calendar-toolbar">
+          <button id="prevMonth" class="secondary">← Месяц назад</button>
+          <strong id="monthLabel"></strong>
+          <button id="nextMonth" class="secondary">Месяц вперед →</button>
+        </div>
+        <div id="calendar" class="calendar"></div>
+      </section>
+
+      <section class="card" id="editCard" hidden>
+        <h2>3) Редактирование дня</h2>
+        <p id="selectedDate" class="muted">Выберите дату в календаре</p>
+        <div class="grid-2">
+          <label>
+            Статус
+            <select id="dayStatus">
+              <option value="work">work</option>
+              <option value="off">off</option>
+              <option value="vacation">vacation</option>
+              <option value="sick">sick</option>
+              <option value="custom">custom</option>
+            </select>
+          </label>
+          <label>
+            Комментарий (необязательно)
+            <input id="dayComment" type="text" placeholder="Например: смена в магазине 3" />
+          </label>
+          <label>
+            Начало смены
+            <input id="shiftStart" type="time" />
+          </label>
+          <label>
+            Конец смены
+            <input id="shiftEnd" type="time" />
+          </label>
+          <label>
+            Начало перерыва
+            <input id="breakStart" type="time" />
+          </label>
+          <label>
+            Конец перерыва
+            <input id="breakEnd" type="time" />
+          </label>
+        </div>
+        <div class="row">
+          <button id="saveDayBtn">Сохранить день</button>
+          <button id="removeDayBtn" class="danger">Удалить день</button>
+        </div>
+      </section>
+
+      <section class="card" id="rangeCard" hidden>
+        <h2>4) Массовое добавление через интерфейс</h2>
+        <div class="grid-2">
+          <label>
+            С даты
+            <input id="rangeStart" type="date" />
+          </label>
+          <label>
+            По дату
+            <input id="rangeEnd" type="date" />
+          </label>
+          <label>
+            Статус для диапазона
+            <select id="rangeStatus">
+              <option value="work">work</option>
+              <option value="off">off</option>
+              <option value="vacation">vacation</option>
+              <option value="sick">sick</option>
+              <option value="custom">custom</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <button id="applyRangeBtn">Применить диапазон</button>
+        </div>
+      </section>
+
+      <section class="card" id="saveCard" hidden>
+        <h2>5) Отправка изменений</h2>
+        <p class="muted">
+          API сохраняет график целиком: при отправке все выбранные дни будут перезаписаны.
+        </p>
+        <div class="row">
+          <button id="loadDemoBtn" class="secondary">Загрузить тестовые данные</button>
+          <button id="saveAllBtn">Сохранить весь график в API</button>
+          <button id="reloadBtn" class="secondary">Перезагрузить из API</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Лог</h2>
+        <pre id="log"></pre>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
