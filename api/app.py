@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from db import Base, engine, get_db
@@ -35,6 +39,13 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["system"])
     async def health_check():
         return {"status": "ok"}
+
+    static_dir = Path(__file__).parent / "static"
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+    @app.get("/", include_in_schema=False)
+    async def serve_ui():
+        return FileResponse(static_dir / "index.html")
 
     #@app.get("/me", tags=["auth"])
     #async def read_me(current_user: User = Depends(get_current_active_user)):
