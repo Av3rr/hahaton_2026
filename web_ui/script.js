@@ -1,9 +1,7 @@
 const state = {
   apiUrl: 'http://localhost:8000',
   token: '',
-  me: null,
   period: null,
-  localMode: false,
   schedule: {}, // { 'YYYY-MM-DD': { status, meta } }
   selectedDay: null,
   viewMonthDate: new Date(),
@@ -19,10 +17,7 @@ function log(message, data) {
 }
 
 function formatDateKey(d) {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return d.toISOString().slice(0, 10);
 }
 
 function parseDateKey(key) {
@@ -51,7 +46,6 @@ async function apiFetch(path, options = {}) {
 }
 
 function inPeriod(date) {
-  if (state.localMode) return true;
   if (!state.period) return false;
   const key = formatDateKey(date);
   return key >= state.period.period_start && key <= state.period.period_end;
@@ -149,35 +143,20 @@ async function login() {
 }
 
 async function loadData() {
-  state.me = await apiFetch('/auth/me');
   const period = await apiFetch('/periods/current');
   state.period = period;
 
   if (!period) {
-    state.localMode = true;
-    state.viewMonthDate = new Date();
-    state.schedule = {};
     $('periodCard').hidden = false;
-    $('editCard').hidden = false;
-    $('rangeCard').hidden = false;
-    $('saveCard').hidden = false;
-    $('saveAllBtn').disabled = true;
-    $('periodText').textContent =
-      state.me?.alliance
-        ? `Активного периода нет для альянса "${state.me.alliance}". Проверьте, что менеджер открыл период. Доступен локальный режим редактирования.`
-        : 'Активного периода нет, потому что у пользователя не указан alliance. Доступен локальный режим редактирования.';
-    $('rangeStart').value = formatDateKey(new Date(state.viewMonthDate.getFullYear(), state.viewMonthDate.getMonth(), 1));
-    $('rangeEnd').value = formatDateKey(new Date(state.viewMonthDate.getFullYear(), state.viewMonthDate.getMonth() + 1, 0));
-    renderCalendar();
-    log('Активный период не найден, включен локальный режим', {
-      alliance: state.me?.alliance || null,
-      email: state.me?.email || null,
-    });
+    $('editCard').hidden = true;
+    $('rangeCard').hidden = true;
+    $('saveCard').hidden = true;
+    $('periodText').textContent = 'Активного периода нет.';
+    $('calendar').innerHTML = '';
+    log('Активный период не найден');
     return;
   }
 
-  state.localMode = false;
-  $('saveAllBtn').disabled = false;
   state.viewMonthDate = parseDateKey(period.period_start);
   $('periodText').textContent =
     `Период: ${period.period_start} → ${period.period_end}, дедлайн: ${new Date(period.deadline).toLocaleString('ru-RU')}`;
@@ -236,7 +215,7 @@ function removeDay() {
 }
 
 function applyRange() {
-  if (!state.period && !state.localMode) {
+  if (!state.period) {
     throw new Error('Сначала загрузите активный период');
   }
 
@@ -246,7 +225,7 @@ function applyRange() {
     throw new Error('Проверьте корректность диапазона дат');
   }
 
-  if (state.period && (start < state.period.period_start || end > state.period.period_end)) {
+  if (start < state.period.period_start || end > state.period.period_end) {
     throw new Error('Диапазон должен быть внутри активного периода');
   }
 
@@ -268,10 +247,6 @@ function applyRange() {
 }
 
 async function saveAll() {
-  if (state.localMode) {
-    throw new Error('Нельзя сохранить в API без активного периода. Обратитесь к менеджеру для открытия периода.');
-  }
-
   const payload = { days: state.schedule };
   const updated = await apiFetch('/schedules/me', {
     method: 'PUT',
