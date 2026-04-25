@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T2 Schedule — Календарь</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="topbar">
+      <h1>T2 Schedule</h1>
+      <div id="userPanel" class="hidden">
+        <span id="userEmail"></span>
+        <button id="logoutBtn" class="secondary">Выйти</button>
+      </div>
+    </header>
+
+    <section id="authCard" class="card">
+      <h2>Авторизация</h2>
+      <p class="hint">Войдите, чтобы заполнять график работы.</p>
+      <form id="loginForm" class="form-grid">
+        <label>
+          Email
+          <input id="emailInput" type="email" required placeholder="name@example.com" />
+        </label>
+        <label>
+          Пароль
+          <input id="passwordInput" type="password" required placeholder="••••••••" />
+        </label>
+        <button type="submit">Войти</button>
+      </form>
+      <p id="authError" class="error"></p>
+    </section>
+
+    <section id="calendarSection" class="card hidden">
+      <div class="calendar-header">
+        <h2>Календарь рабочего времени</h2>
+        <div class="calendar-nav">
+          <button id="prevMonthBtn" class="secondary">←</button>
+          <span id="monthLabel"></span>
+          <button id="nextMonthBtn" class="secondary">→</button>
+        </div>
+      </div>
+      <p class="hint">Кликните по дню, чтобы добавить/изменить рабочее время.</p>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <p id="verificationWarning" class="warning"></p>
+      <p id="periodWarning" class="warning"></p>
+      <p id="saveStatus" class="hint"></p>
+    </section>
+  </main>
+
+  <dialog id="dayEditorDialog">
+    <form id="dayEditorForm" method="dialog">
+      <h3 id="editorDateTitle">Редактирование дня</h3>
+
+      <label>
+        Статус
+        <select id="statusSelect" required>
+          <option value="shift">Смена</option>
+          <option value="split">Разделенная смена</option>
+          <option value="dayoff">Выходной</option>
+          <option value="vacation">Отпуск</option>
+        </select>
+      </label>
+
+      <div id="shiftFields" class="editor-group">
+        <label>Начало смены <input id="shiftStart" type="time" /></label>
+        <label>Конец смены <input id="shiftEnd" type="time" /></label>
+      </div>
+
+      <div id="splitFields" class="editor-group hidden">
+        <label>Начало 1 <input id="splitStart1" type="time" /></label>
+        <label>Конец 1 <input id="splitEnd1" type="time" /></label>
+        <label>Начало 2 <input id="splitStart2" type="time" /></label>
+        <label>Конец 2 <input id="splitEnd2" type="time" /></label>
+      </div>
+
+      <menu>
+        <button id="removeEntryBtn" value="remove" class="danger" type="button">Очистить день</button>
+        <button value="cancel" class="secondary" type="button" id="cancelBtn">Отмена</button>
+        <button value="default" type="submit">Сохранить</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
