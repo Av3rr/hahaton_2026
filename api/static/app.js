@@ -8,6 +8,7 @@ const state = {
   currentMonth: new Date(),
   selectedDate: null,
   canEditSchedule: true,
+
 };
 
 const authCard = document.getElementById("authCard");
@@ -20,6 +21,7 @@ const calendarSection = document.getElementById("calendarSection");
 const monthLabel = document.getElementById("monthLabel");
 const calendarGrid = document.getElementById("calendarGrid");
 const verificationWarning = document.getElementById("verificationWarning");
+
 const periodWarning = document.getElementById("periodWarning");
 const saveStatus = document.getElementById("saveStatus");
 
@@ -150,6 +152,8 @@ async function bootstrapAuthorizedUI() {
       throw error;
     }
   }
+  const schedule = await apiGet("/schedules/me");
+  state.entries = normalizeEntries(schedule);
 
   authCard.classList.add("hidden");
   calendarSection.classList.remove("hidden");
@@ -221,6 +225,9 @@ function renderCalendar() {
     if (!canEditDay) {
       cell.disabled = true;
       cell.title = state.canEditSchedule ? "Дата вне активного периода" : "Заполнение графика доступно только верифицированным пользователям";
+    if (!isInPeriod) {
+      cell.disabled = true;
+      cell.title = "Дата вне активного периода";
     } else {
       cell.addEventListener("click", () => openEditor(iso));
     }
